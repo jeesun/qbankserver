@@ -59,7 +59,7 @@ public class VeriCodeController {
             req.setSmsFreeSignName("星益");
             req.setSmsParamString("{veriCode:'"+veriCode.getCode()+"'}");
             req.setRecNum(phone);
-            req.setSmsTemplateCode("SMS_15150016");
+            req.setSmsTemplateCode("SMS_50225027");
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             System.out.println(rsp.getBody());
             if (rsp.getResult().getSuccess()){
@@ -72,7 +72,7 @@ public class VeriCodeController {
 
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 500);
-            responseMap.put(ServerContext.MSG, "验证码请求次数过多，请稍后重试");
+            responseMap.put(ServerContext.MSG, e.getMessage());
             responseMap.put(ServerContext.DEV_MSG, e.getMessage());
         }
 
