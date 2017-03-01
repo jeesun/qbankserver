@@ -22,14 +22,14 @@ public class Swagger2 {
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors
-                        .basePackage("com.simon.cient.controller"))
+                        .basePackage("com.simon.controller"))
                 .paths(PathSelectors.any()).build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("restful api documentation")
-                .description("for star child's app")
+                .description("for question bank app")
                 .termsOfServiceUrl("termsOfServiceUrl")
                 .contact("Simon Sun")
                 .version("1.0").build();
