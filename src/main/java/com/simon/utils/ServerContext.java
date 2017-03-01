@@ -20,6 +20,8 @@ public class ServerContext {
     public static final String DAYU_URL_REAL = "http://gw.api.taobao.com/router/rest";
     public static final String DAYU_APP_KEY = "23656595";
     public static final String DAYU_APP_SECRET = "f5b33f982cc1e5a8becbf37cd03e51fb";
+    public static final String DAYU_SMS_FREE_SIGN_NAME = "益题库";
+    public static final String DAYU_SMS_TEMPLATE_CODE = "SMS_50225027";
 
     public static final String JIGUANG_APP_KEY = "2cb1b6f5ee6c596abe813e49";
     public static final String JIGUANG_MASTER_SECRET = "aa81152ecac5776f2ff6db91";

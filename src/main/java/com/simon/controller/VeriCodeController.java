@@ -1,5 +1,6 @@
 package com.simon.controller;
 
+import com.mongodb.connection.Server;
 import com.simon.domain.VeriCode;
 import com.simon.repository.VeriCodeRepository;
 import com.simon.utils.ServerContext;
@@ -56,10 +57,10 @@ public class VeriCodeController {
             AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
             req.setExtend("");
             req.setSmsType("normal");
-            req.setSmsFreeSignName("星益");
+            req.setSmsFreeSignName(ServerContext.DAYU_SMS_FREE_SIGN_NAME);
             req.setSmsParamString("{veriCode:'"+veriCode.getCode()+"'}");
             req.setRecNum(phone);
-            req.setSmsTemplateCode("SMS_50225027");
+            req.setSmsTemplateCode(ServerContext.DAYU_SMS_TEMPLATE_CODE);
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             System.out.println(rsp.getBody());
             if (rsp.getResult().getSuccess()){

@@ -115,7 +115,7 @@
 		<!-- swagger依赖end -->
 
 		<!-- ali dayu jar start -->
-		<!--<dependency>
+		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>dayu</artifactId>
 			<version>1.0</version>
@@ -124,23 +124,27 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>dayu-source</artifactId>
 			<version>1.0</version>
-		</dependency>-->
+		</dependency>
 		<!-- ali dayu jar end -->
 		<!-- ali dayu jar start -->
-		<dependency>
-			<groupId>com.alibaba</groupId>  <!--自定义-->
-			<artifactId>dayu</artifactId>    <!--自定义-->
-			<version>1.0</version> <!--自定义-->
-			<scope>system</scope> <!--system，类似provided，需要显式提供依赖的jar。以后，Maven就不会在Repository中查找它-->
-			<systemPath>${project.basedir}/src/main/resources/jars/taobao-sdk-java-auto_1455552377940-20160607.jar</systemPath> <!--项目根目录下的lib文件夹下-->
+		<!--<dependency>
+			<groupId>com.alibaba</groupId>  &lt;!&ndash;自定义&ndash;&gt;
+			<artifactId>dayu</artifactId>    &lt;!&ndash;自定义&ndash;&gt;
+			<version>1.0</version> &lt;!&ndash;自定义&ndash;&gt;
+			<scope>system</scope> &lt;!&ndash;system，类似provided，需要显式提供依赖的jar。以后，Maven就不会在Repository中查找它&ndash;&gt;
+			<systemPath>${project.basedir}/src/main/resources/jars/taobao-sdk-java-auto_1455552377940-20160607.jar</systemPath> &lt;!&ndash;项目根目录下的lib文件夹下&ndash;&gt;
+			&lt;!&ndash;<type>jar</type>
+			<optional>true</optional>&ndash;&gt;
 		</dependency>
 		<dependency>
-			<groupId>com.alibaba</groupId>  <!--自定义-->
-			<artifactId>dayu-source</artifactId>    <!--自定义-->
-			<version>1.0</version> <!--自定义-->
-			<scope>system</scope> <!--system，类似provided，需要显式提供依赖的jar。以后，Maven就不会在Repository中查找它-->
-			<systemPath>${project.basedir}/src/main/resources/jars/taobao-sdk-java-auto_1455552377940-20160607-source.jar</systemPath> <!--项目根目录下的lib文件夹下-->
-		</dependency>
+			<groupId>com.alibaba</groupId>  &lt;!&ndash;自定义&ndash;&gt;
+			<artifactId>dayu-source</artifactId>    &lt;!&ndash;自定义&ndash;&gt;
+			<version>1.0</version> &lt;!&ndash;自定义&ndash;&gt;
+			<scope>system</scope> &lt;!&ndash;system，类似provided，需要显式提供依赖的jar。以后，Maven就不会在Repository中查找它&ndash;&gt;
+			<systemPath>${project.basedir}/src/main/resources/jars/taobao-sdk-java-auto_1455552377940-20160607-source.jar</systemPath> &lt;!&ndash;项目根目录下的lib文件夹下&ndash;&gt;
+			&lt;!&ndash;<type>jar</type>
+			<optional>true</optional>&ndash;&gt;
+		</dependency>-->
 		<!-- ali dayu jar end -->
 	</dependencies>
 
@@ -193,17 +197,20 @@
 					</resources>
 				</configuration>
 			</plugin>
-			<plugin>
+
+			<!--解决Maven关于本地jar包的打包处理的问题。不加，打包时不会把dayu的jar也处理。-->
+			<!--屌用没有-->
+			<!--<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 					<compilerArguments>
-						<extdirs>${project.basedir}/lib</extdirs>
+						<extdirs>${project.basedir}/src/main/resources/jars</extdirs>
 					</compilerArguments>
 				</configuration>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 </project>
