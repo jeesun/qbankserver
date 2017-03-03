@@ -97,9 +97,9 @@ public class OauthUserController {
     @RequestMapping(method = RequestMethod.POST)
     private Map<String, Object> post(@RequestParam Integer code, @RequestParam String phone, @RequestParam String password) {
 
-        logger.warn("code: "+code);
+        /*logger.warn("code: "+code);
         logger.warn("phone: "+phone);
-        logger.warn("password: "+password);
+        logger.warn("password: "+password);*/
 
         //加密密码
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
@@ -113,14 +113,15 @@ public class OauthUserController {
                 int result1 = jdbcTemplate.update("INSERT INTO users (username,password,enabled) VALUES (?, ?, ?)",
                         phone, password, true);
                 int result2 = jdbcTemplate.update("INSERT INTO authorities (username, authority) VALUES (?, ?)",
-                        phone, "ROLE_APP");
+                        phone, "ROLE_USER");
 
-                logger.warn("result of insert to users: "+result1);
-                logger.warn("result of insert to authorities: "+result2);
+                /*logger.warn("result of insert to users: "+result1);
+                logger.warn("result of insert to authorities: "+result2);*/
 
                 AppUser appUser = new AppUser();
                 //String name = "sc"+Long.toString(System.currentTimeMillis()/1000, 26);
-                String name = "starchild"+phone.substring(phone.length()-4);
+//                String name = "starchild"+phone.substring(phone.length()-4);
+                String name = "phone_"+phone;
                 appUser.setUsername(name);
                 appUser.setPhone(phone);
 
