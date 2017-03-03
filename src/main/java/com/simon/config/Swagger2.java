@@ -31,7 +31,6 @@ public class Swagger2 {
                 .title("restful api documentation")
                 .description("for question bank app")
                 .termsOfServiceUrl("termsOfServiceUrl")
-                .contact("Simon Sun")
                 .version("1.0").build();
     }
 }

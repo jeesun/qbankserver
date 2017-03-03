@@ -1,13 +1,21 @@
 package com.simon.controller;
 
+import com.mongodb.connection.Server;
 import com.simon.domain.AppUser;
 import com.simon.domain.VeriCode;
 import com.simon.domain.jdbc.OauthUser;
+import com.simon.domain.token.AccessToken;
 import com.simon.repository.AppUserRepository;
 import com.simon.repository.VeriCodeRepository;
+import com.simon.utils.HttpClientUtil;
 import com.simon.utils.ServerContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +25,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,10 +61,25 @@ public class OauthUserController {
             if (null!=oauthUser&&encoder.matches(password, oauthUser.getPassword())){
                 AppUser appUser = appUserRepository.findByPhone(phone);
 
+                Map<String, String> map = new LinkedHashMap<>();
+                map.put("grant_type", "password");
+                map.put("client_id", "clientIdPassword");
+                map.put("client_secret", "secret");
+                map.put("username", phone);
+                map.put("password", password);
+
+                //拿到用户信息和access_token
+                AccessToken accessToken = HttpClientUtil.postAndGetToken("clientIdPassword",
+                        "secret", ServerContext.OAUTH_URI, map, "UTF-8");
+
+                Map<String, Object> dataMap = new LinkedHashMap<>();
+                dataMap.put("userInfo", appUser);
+                dataMap.put("token", accessToken);
 
                 responseMap.put(ServerContext.STATUS_CODE, 200);
                 responseMap.put(ServerContext.MSG, "登录成功");
-//                responseMap.put(ServerContext.DATA, personInfo);
+                responseMap.put(ServerContext.DATA, dataMap);
+
             }else{
                 responseMap.put(ServerContext.STATUS_CODE, 404);
                 responseMap.put(ServerContext.MSG, "用户名或者密码错误");
