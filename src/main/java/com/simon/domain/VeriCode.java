@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * Created by simon on 2017/2/28.
  */
 //验证码
-@Document(collection = "veri_code")
+@Document(collection = "qb_veri_code")
 public class VeriCode {
     @Id
     private String id;

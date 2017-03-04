@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 /**
  * Created by simon on 2016/8/13.
  */
-@Document(collection = "app_user")
+@Document(collection = "qb_app_user")
 public class AppUser {
     @Id
     private String id;
