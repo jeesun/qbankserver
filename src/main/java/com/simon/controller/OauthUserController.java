@@ -147,6 +147,45 @@ public class OauthUserController {
         return responseMap;
     }
 
+    @ApiOperation(value = "注册（不需要验证码；由于阿里大于不再免费，所以提供该接口）", notes = "注册成功返回appUser对象，包含自动生成的username", httpMethod = "POST")
+    @RequestMapping(method = RequestMethod.POST)
+    private Map<String, Object> post(@RequestParam String phone, @RequestParam String password) {
+
+        //加密密码
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
+        password = encoder.encode(password);
+
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+        //判断username是否存在
+        try {
+            int result1 = jdbcTemplate.update("INSERT INTO users (username,password,enabled) VALUES (?, ?, ?)",
+                    phone, password, true);
+            int result2 = jdbcTemplate.update("INSERT INTO authorities (username, authority) VALUES (?, ?)",
+                    phone, "ROLE_USER");
+
+            AppUser appUser = new AppUser();
+            String name = "phone_"+phone;
+            appUser.setUsername(name);
+            appUser.setPhone(phone);
+
+            appUser = appUserRepository.save(appUser);
+
+            logger.warn(appUser.toString());
+
+            if (result1 > 0 && result2 > 0) {
+                responseMap.put(ServerContext.STATUS_CODE, 201);//201 (Created)
+                responseMap.put(ServerContext.MSG, "注册成功");
+                responseMap.put(ServerContext.DATA, appUserRepository.findByUsername(name));
+            }
+        } catch (DataIntegrityViolationException e) {
+            responseMap.put(ServerContext.STATUS_CODE, 409);
+            responseMap.put(ServerContext.MSG, "用户名已存在");
+            responseMap.put(ServerContext.DEV_MSG, e.getMessage());
+        }
+
+        return responseMap;
+    }
+
     @ApiOperation(value = "更新密码（使用旧密码）", notes = "目前密码是明文存储，正式发布前需要做加密")
     @RequestMapping(value = "/updatePassword/{oldPassword}/{newPassword}", method = RequestMethod.PATCH)
     private Map<String, Object> updatePassword(@RequestParam String access_token, @PathVariable String oldPassword, @PathVariable String newPassword){
