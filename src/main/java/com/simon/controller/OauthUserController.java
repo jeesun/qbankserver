@@ -93,8 +93,9 @@ public class OauthUserController {
         return responseMap;
     }
 
+    @Deprecated
     @ApiOperation(value = "注册", notes = "注册成功返回appUser对象，包含自动生成的username", httpMethod = "POST")
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/registerWithVericode",method = RequestMethod.POST)
     private Map<String, Object> post(@RequestParam Integer code, @RequestParam String phone, @RequestParam String password) {
 
         /*logger.warn("code: "+code);
