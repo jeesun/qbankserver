@@ -307,7 +307,9 @@ public class AppUserController {
     }
 
     private String getPhoneByAccessToken(String access_token){
+        /*return jdbcTemplate.queryForObject("SELECT user_name FROM oauth_access_token" +
+                " WHERE encode(token, 'escape') LIKE CONCAT('%', ?)", new Object[]{access_token}, String.class);*/
         return jdbcTemplate.queryForObject("SELECT user_name FROM oauth_access_token" +
-                " WHERE encode(token, 'escape') LIKE CONCAT('%', ?)", new Object[]{access_token}, String.class);
+                " WHERE right(cast(token as char), 36)=?", new Object[]{access_token}, String.class);
     }
 }
