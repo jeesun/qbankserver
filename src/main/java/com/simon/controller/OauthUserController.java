@@ -196,19 +196,25 @@ public class OauthUserController {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
 
-        if (null!=oauthUser&&encoder.matches(oldPassword, oauthUser.getPassword())){
-            try{
-                this.jdbcTemplate.update("UPDATE users SET password = ? WHERE username = ?", newPassword, phone);
-                responseMap.put(ServerContext.STATUS_CODE, 200);
-                responseMap.put(ServerContext.MSG, "更新密码成功");
-            }catch (Exception e){
+        if (null!=oauthUser){
+            if(encoder.matches(oldPassword, oauthUser.getPassword())){
+                try{
+                    this.jdbcTemplate.update("UPDATE users SET password = ? WHERE username = ?", encoder.encode(newPassword), phone);
+                    responseMap.put(ServerContext.STATUS_CODE, 200);
+                    responseMap.put(ServerContext.MSG, "更新密码成功");
+                }catch (Exception e){
+                    responseMap.put(ServerContext.STATUS_CODE, 404);
+                    responseMap.put(ServerContext.MSG, "更新密码失败");
+                    responseMap.put(ServerContext.DEV_MSG, e.getMessage());
+                }
+            }else{
                 responseMap.put(ServerContext.STATUS_CODE, 404);
-                responseMap.put(ServerContext.MSG, "更新密码失败");
-                responseMap.put(ServerContext.DEV_MSG, e.getMessage());
+                responseMap.put(ServerContext.MSG, "旧密码错误");
             }
-        }else{
+
+        }else {
             responseMap.put(ServerContext.STATUS_CODE, 404);
-            responseMap.put(ServerContext.MSG, "手机号尚未注册，或者密码错误");
+            responseMap.put(ServerContext.MSG, "手机号尚未注册");
         }
 
         return responseMap;
