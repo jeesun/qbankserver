@@ -1,0 +1,77 @@
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  messages:
+    encoding: UTF-8
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/thymelte?useUnicode=true&amp;characterEncoding=UTF-8
+    username: postgres
+    password: 19961120
+    type: com.alibaba.druid.pool.DruidDataSource
+  jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+
+security:
+  basic:
+    enabled: false
+
+server:
+  port: 8184
+  tomcat:
+    uri-encoding: UTF-8
+
+endpoints:
+  health:
+    sensitive: true
+
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        web: INFO
+      hibernate: ERROR
+  file: /logs/qbankserver/qbankserver.log
+  config: classpath:logback.xml
+
+banner:
+  charset: UTF-8
+  location: banner.txt
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+info:
+  app:
+    name: @project.name@
+    description: @project.description@
+  build:
+    groupId: @project.groupId@
+    artifact: @project.artifactId@
+    name: @project.name@
+    version: @project.version@
+  git:
+    branch: ${git.branch}
+    commit:
+      id: ${git.commit.id}
+      time: ${git.commit.time}
+  env:
+    java:
+      vendor: ${java.specification.vendor}
+      vm-name: ${java.vm.name}
+      runtime-version: ${java.runtime.version}
+
+management:
+  info:
+    git:
+      mode: full
