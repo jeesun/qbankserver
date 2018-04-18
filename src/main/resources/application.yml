@@ -37,7 +37,7 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
-  file: /logs/qbankserver/qbankserver.log
+  file: logs/qbankserver.log
   config: classpath:logback.xml
 
 banner:
