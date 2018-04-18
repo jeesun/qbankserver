@@ -202,6 +202,13 @@
 							<directory>${project.build.directory}</directory>
 							<include>${project.build.finalName}.jar</include>
 						</resource>
+						<resource>
+							<filtering>true</filtering>
+							<directory>${basedir}/src/main/resources</directory>
+							<includes>
+								<include>*</include>
+							</includes>
+						</resource>
 					</resources>
 				</configuration>
 			</plugin>

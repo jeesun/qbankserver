@@ -32,12 +32,11 @@ endpoints:
 
 logging:
   level:
-    root: WARN
+    #root: WARN # 此处的root配置，会覆盖logback.xml文件相关配置。
     org:
       springframework:
         web: INFO
       hibernate: ERROR
-  file: logs/qbankserver.log
   config: classpath:logback.xml
 
 banner:
