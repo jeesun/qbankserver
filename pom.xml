@@ -206,6 +206,23 @@
 				</configuration>
 			</plugin>
 
+			<!-- 该插件用来产生git的版本信息 -->
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>2.2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+				</configuration>
+			</plugin>
+
 			<!--解决Maven关于本地jar包的打包处理的问题。不加，打包时不会把dayu的jar也处理。-->
 			<!--屌用没有-->
 			<!--<plugin>

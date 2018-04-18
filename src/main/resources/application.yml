@@ -71,6 +71,7 @@ info:
       vm-name: ${java.vm.name}
       runtime-version: ${java.runtime.version}
 
+# 获取更全面的git信息
 management:
   info:
     git:
