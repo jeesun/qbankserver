@@ -1,6 +1,5 @@
 package com.simon.controller;
 
-import com.mongodb.connection.Server;
 import com.simon.domain.VeriCode;
 import com.simon.repository.VeriCodeRepository;
 import com.simon.utils.ServerContext;
@@ -43,7 +42,7 @@ public class VeriCodeController {
                 veriCode.setCode((int)Math.random()*899999+100000);
                 veriCode.setCreateTime(System.currentTimeMillis());
                 veriCode.setExpires(30*60);
-                veriCodeRepository.insert(veriCode);
+                veriCodeRepository.save(veriCode);
             }else{
                 if (System.currentTimeMillis()>(veriCode.getCreateTime()+veriCode.getExpires()-60*5)){
                     veriCode.setCode((int)(Math.random()*899999)+100000);

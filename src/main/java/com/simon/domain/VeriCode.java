@@ -1,34 +1,30 @@
 package com.simon.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import javax.persistence.*;
 
 /**
  * Created by simon on 2017/2/28.
  */
-//验证码
-@Document(collection = "qb_veri_code")
+
+@Table
+@Entity
 public class VeriCode {
     @Id
-    private String id;
+    private Long id;
 
-    @Indexed(unique = true)
     private String phone;
 
     private Integer code;
 
-    @Field("create_time")
     private Long createTime;
 
     private Integer expires;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

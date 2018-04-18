@@ -1,47 +1,48 @@
 package com.simon.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import javax.persistence.*;
 
 /**
  * Created by simon on 2016/8/13.
  */
-@Document(collection = "qb_app_user")
-public class AppUser {
+@Table(name = "user_info")
+@Entity
+public class UserInfo {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Indexed(unique = true)
+    private String userId;
     private String username;
-
-    @Indexed(unique = true)
     private String phone;
-
     private Boolean sex;
     private Integer age;
     private String birth;
 
-    @Field("person_brief")
     private String personBrief;
 
-    @Field("head_photo")
     private String headPhoto;
 
-    @Field("visit_card")
     private String visitCard;
 
     private String address;
 
     private String email;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {

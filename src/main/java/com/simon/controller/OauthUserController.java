@@ -1,21 +1,15 @@
 package com.simon.controller;
 
-import com.mongodb.connection.Server;
-import com.simon.domain.AppUser;
+import com.simon.domain.UserInfo;
 import com.simon.domain.VeriCode;
 import com.simon.domain.jdbc.OauthUser;
 import com.simon.domain.token.AccessToken;
-import com.simon.repository.AppUserRepository;
+import com.simon.repository.UserInfoRepository;
 import com.simon.repository.VeriCodeRepository;
 import com.simon.utils.HttpClientUtil;
 import com.simon.utils.ServerContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,12 +27,12 @@ import java.util.Map;
  */
 @Api(value="登录注册", description = "登录注册")
 @RestController
-@RequestMapping("/api/oauthUser")
+@RequestMapping("/api/oauthUsers")
 public class OauthUserController {
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Autowired
-    AppUserRepository appUserRepository;
+    UserInfoRepository userInfoRepository;
     @Autowired
     VeriCodeRepository veriCodeRepository;
 
@@ -59,7 +51,7 @@ public class OauthUserController {
             //用户密码被加密了
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
             if (null!=oauthUser&&encoder.matches(password, oauthUser.getPassword())){
-                AppUser appUser = appUserRepository.findByPhone(phone);
+                UserInfo appUser = userInfoRepository.findByPhone(phone);
 
                 Map<String, String> map = new LinkedHashMap<>();
                 map.put("grant_type", "password");
@@ -119,21 +111,21 @@ public class OauthUserController {
                 /*logger.warn("result of insert to users: "+result1);
                 logger.warn("result of insert to authorities: "+result2);*/
 
-                AppUser appUser = new AppUser();
+                UserInfo appUser = new UserInfo();
                 //String name = "sc"+Long.toString(System.currentTimeMillis()/1000, 26);
 //                String name = "starchild"+phone.substring(phone.length()-4);
                 String name = "phone_"+phone;
                 appUser.setUsername(name);
                 appUser.setPhone(phone);
 
-                appUser = appUserRepository.save(appUser);
+                appUser = userInfoRepository.save(appUser);
 
                 logger.warn(appUser.toString());
 
                 if (result1 > 0 && result2 > 0 && null!=appUser) {
                     responseMap.put(ServerContext.STATUS_CODE, 201);//201 (Created)
                     responseMap.put(ServerContext.MSG, "注册成功");
-                    responseMap.put(ServerContext.DATA, appUserRepository.findByUsername(name));
+                    responseMap.put(ServerContext.DATA, userInfoRepository.findByUsername(name));
                 }
             } catch (DataIntegrityViolationException e) {
                 responseMap.put(ServerContext.STATUS_CODE, 409);
@@ -164,19 +156,19 @@ public class OauthUserController {
             int result2 = jdbcTemplate.update("INSERT INTO authorities (username, authority) VALUES (?, ?)",
                     phone, "ROLE_USER");
 
-            AppUser appUser = new AppUser();
+            UserInfo appUser = new UserInfo();
             String name = "phone_"+phone;
             appUser.setUsername(name);
             appUser.setPhone(phone);
 
-            appUser = appUserRepository.save(appUser);
+            appUser = userInfoRepository.save(appUser);
 
             logger.warn(appUser.toString());
 
             if (result1 > 0 && result2 > 0) {
                 responseMap.put(ServerContext.STATUS_CODE, 201);//201 (Created)
                 responseMap.put(ServerContext.MSG, "注册成功");
-                responseMap.put(ServerContext.DATA, appUserRepository.findByUsername(name));
+                responseMap.put(ServerContext.DATA, userInfoRepository.findByUsername(name));
             }
         } catch (DataIntegrityViolationException e) {
             responseMap.put(ServerContext.STATUS_CODE, 409);

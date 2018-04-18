@@ -1,7 +1,7 @@
 package com.simon.controller;
 
-import com.simon.domain.AppUser;
-import com.simon.repository.AppUserRepository;
+import com.simon.domain.UserInfo;
+import com.simon.repository.UserInfoRepository;
 import com.simon.utils.ImageUtil;
 import com.simon.utils.ServerContext;
 import io.swagger.annotations.Api;
@@ -24,10 +24,10 @@ import java.util.Map;
  */
 @Api(value="用户信息", description = "用户信息")
 @RestController
-@RequestMapping("/api/appUserInfo")
-public class AppUserController {
+@RequestMapping("/api/userInfos")
+public class UserInfoController {
     @Autowired
-    private AppUserRepository appUserRepository;
+    private UserInfoRepository userInfoRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -37,7 +37,7 @@ public class AppUserController {
     private static final String ROOT = "appUsers";
 
     @Autowired
-    public AppUserController(ResourceLoader resourceLoader) {
+    public UserInfoController(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
@@ -86,7 +86,7 @@ public class AppUserController {
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "获取用户信息成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.findByPhone(phone));
+            responseMap.put(ServerContext.DATA, userInfoRepository.findByPhone(phone));
         }catch (DataRetrievalFailureException e) {
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "获取用户信息失败");
@@ -102,7 +102,7 @@ public class AppUserController {
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "获取用户信息成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.findById(userId));
+            responseMap.put(ServerContext.DATA, userInfoRepository.findById(userId));
         }catch (DataRetrievalFailureException e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "获取用户信息失败");
@@ -118,7 +118,7 @@ public class AppUserController {
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "获取用户信息成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.findByUsername(username));
+            responseMap.put(ServerContext.DATA, userInfoRepository.findByUsername(username));
         }catch (DataRetrievalFailureException e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "获取用户信息失败");
@@ -132,9 +132,9 @@ public class AppUserController {
     private Map<String, Object> updateHeadPhoto(@RequestParam String access_token, @RequestParam String photoBase64){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        String headPhotoUrl = ROOT+"/"+appUser.getPhone() + "/" + System.currentTimeMillis() + ".png";
-        String headPhotoDir = ROOT + "/" + appUser.getPhone();
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        String headPhotoUrl = ROOT+"/"+userInfo.getPhone() + "/" + System.currentTimeMillis() + ".png";
+        String headPhotoDir = ROOT + "/" + userInfo.getPhone();
         try{
             if (!Files.exists(Paths.get(headPhotoDir))){
                 Files.createDirectories(Paths.get(headPhotoDir));
@@ -144,10 +144,10 @@ public class AppUserController {
             }
 
             Files.write(Paths.get(headPhotoUrl), ImageUtil.convertToBytes(photoBase64));
-            appUser.setHeadPhoto(headPhotoUrl);
+            userInfo.setHeadPhoto(headPhotoUrl);
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新头像成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (IOException e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "创建文件夹或者文件失败");
@@ -175,12 +175,12 @@ public class AppUserController {
     private Map<String, Object> updateUsername(@RequestParam String access_token, @RequestParam String username){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setUsername(username);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setUsername(username);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新用户名成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新用户名失败");
@@ -195,12 +195,12 @@ public class AppUserController {
     private Map<String, Object> updateEmail(@RequestParam String access_token, @RequestParam String email){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setEmail(email);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setEmail(email);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新邮箱成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新邮箱失败");
@@ -215,12 +215,12 @@ public class AppUserController {
     private Map<String, Object> updateSex(@RequestParam String access_token, @RequestParam Boolean sex){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setSex(sex);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setSex(sex);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新性别成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新性别失败");
@@ -235,12 +235,12 @@ public class AppUserController {
     private Map<String, Object> updateBirth(@RequestParam String access_token, @RequestParam String birth){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setBirth(birth);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setBirth(birth);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新生日成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新生日失败");
@@ -254,12 +254,12 @@ public class AppUserController {
     private Map<String, Object> updateAge(@RequestParam String access_token, @RequestParam Integer age){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setAge(age);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setAge(age);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新年龄成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新年龄失败");
@@ -273,12 +273,12 @@ public class AppUserController {
     private Map<String, Object> updatePersonBrief(@RequestParam String access_token, @RequestParam String personBrief){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setPersonBrief(personBrief);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setPersonBrief(personBrief);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新个人简介成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新个人简介失败");
@@ -292,12 +292,12 @@ public class AppUserController {
     private Map<String, Object> updateAddress(@RequestParam String access_token, @RequestParam String address){
         Map<String, Object> responseMap = new LinkedHashMap<>();
         String phone = getPhoneByAccessToken(access_token);
-        AppUser appUser = appUserRepository.findByPhone(phone);
-        appUser.setAddress(address);
+        UserInfo userInfo = userInfoRepository.findByPhone(phone);
+        userInfo.setAddress(address);
         try{
             responseMap.put(ServerContext.STATUS_CODE, 200);
             responseMap.put(ServerContext.MSG, "更新地址成功");
-            responseMap.put(ServerContext.DATA, appUserRepository.save(appUser));
+            responseMap.put(ServerContext.DATA, userInfoRepository.save(userInfo));
         }catch (Exception e){
             responseMap.put(ServerContext.STATUS_CODE, 404);
             responseMap.put(ServerContext.MSG, "更新地址失败");
