@@ -11,10 +11,10 @@ public class UserInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String userId;
+    private Long userId;
     private String username;
     private String phone;
+    private String email;
     private Boolean sex;
     private Integer age;
     private String birth;
@@ -27,8 +27,6 @@ public class UserInfo {
 
     private String address;
 
-    private String email;
-
     public Long getId() {
         return id;
     }
@@ -37,11 +35,11 @@ public class UserInfo {
         this.id = id;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -59,6 +57,14 @@ public class UserInfo {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean getSex() {
@@ -117,20 +123,11 @@ public class UserInfo {
         this.address = address;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     @Override
     public String toString() {
-        return "AppUser{" +
-                "id='" + id + '\'' +
-                ", username='" + username + '\'' +
-                ", phone='" + phone + '\'' +
+        return "UserInfo{" +
+                "id=" + id +
+                ", userId='" + userId + '\'' +
                 ", sex=" + sex +
                 ", age=" + age +
                 ", birth='" + birth + '\'' +
@@ -138,7 +135,6 @@ public class UserInfo {
                 ", headPhoto='" + headPhoto + '\'' +
                 ", visitCard='" + visitCard + '\'' +
                 ", address='" + address + '\'' +
-                ", email='" + email + '\'' +
                 '}';
     }
 }

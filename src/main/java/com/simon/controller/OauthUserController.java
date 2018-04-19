@@ -3,8 +3,11 @@ package com.simon.controller;
 import com.simon.domain.ResultMsg;
 import com.simon.domain.UserInfo;
 import com.simon.domain.VeriCode;
+import com.simon.domain.jdbc.Authority;
 import com.simon.domain.jdbc.OauthUser;
 import com.simon.domain.token.AccessToken;
+import com.simon.repository.AuthorityRepository;
+import com.simon.repository.OauthUserRepository;
 import com.simon.repository.UserInfoRepository;
 import com.simon.repository.VeriCodeRepository;
 import com.simon.utils.HttpClientUtil;
@@ -36,6 +39,12 @@ public class OauthUserController {
     UserInfoRepository userInfoRepository;
     @Autowired
     VeriCodeRepository veriCodeRepository;
+
+    @Autowired
+    private OauthUserRepository oauthUserRepository;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -79,79 +88,42 @@ public class OauthUserController {
     @Deprecated
     @ApiOperation(value = "注册", notes = "注册成功返回appUser对象，包含自动生成的username", httpMethod = "POST")
     @RequestMapping(value = "/registerWithVericode",method = RequestMethod.POST)
-    private ResultMsg post(@RequestParam Integer code, @RequestParam String phone, @RequestParam String password) {
-
-        /*logger.warn("code: "+code);
-        logger.warn("phone: "+phone);
-        logger.warn("password: "+password);*/
-
+    private ResultMsg post(@RequestParam(required = false) Integer code, @RequestParam String phone, @RequestParam String password) {
         //加密密码
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
         password = encoder.encode(password);
 
-        VeriCode veriCode = veriCodeRepository.findByPhoneAndCode(phone, code);
-        if (null!=veriCode){
-            //判断username是否存在
-            try {
-                int result1 = jdbcTemplate.update("INSERT INTO users (username,password,enabled) VALUES (?, ?, ?)",
-                        phone, password, true);
-                int result2 = jdbcTemplate.update("INSERT INTO authorities (username, authority) VALUES (?, ?)",
-                        phone, "ROLE_USER");
-
-                /*logger.warn("result of insert to users: "+result1);
-                logger.warn("result of insert to authorities: "+result2);*/
-
-                UserInfo appUser = new UserInfo();
-                //String name = "sc"+Long.toString(System.currentTimeMillis()/1000, 26);
-//                String name = "starchild"+phone.substring(phone.length()-4);
-                String name = "phone_"+phone;
-                appUser.setUsername(name);
-                appUser.setPhone(phone);
-
-                appUser = userInfoRepository.save(appUser);
-
-                if (result1 > 0 && result2 > 0 && null!=appUser) {
-                    return new ResultMsg(201, "注册成功", userInfoRepository.findByUsername(name));
-                }else{
-                    return new ResultMsg(500, "sql执行失败");
-                }
-            } catch (DataIntegrityViolationException e) {
-                return new ResultMsg(409, "用户名已存在", e.getMessage());
+        if(null != code){
+            VeriCode veriCode = veriCodeRepository.findByPhoneAndCode(phone, code);
+            if (null!=veriCode){
+                return register(phone, password);
+            }else{
+                return new ResultMsg(404, "验证码错误或者过期");
             }
         }else{
-            return new ResultMsg(404, "验证码错误或者过期");
+            return register(phone, password);
         }
     }
 
-    @ApiOperation(value = "注册（不需要验证码；由于阿里大于不再免费，所以提供该接口）", notes = "注册成功返回appUser对象，包含自动生成的username", httpMethod = "POST")
-    @RequestMapping(method = RequestMethod.POST)
-    private ResultMsg post(@RequestParam String phone, @RequestParam String password) {
-
-        //加密密码
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
-        password = encoder.encode(password);
-
+    private ResultMsg register(String phone, String password){
         //判断username是否存在
         try {
-            int result1 = jdbcTemplate.update("INSERT INTO users (username,password,enabled) VALUES (?, ?, ?)",
-                    phone, password, true);
-            int result2 = jdbcTemplate.update("INSERT INTO authorities (username, authority) VALUES (?, ?)",
-                    phone, "ROLE_USER");
+            OauthUser oauthUser = new OauthUser();
+            oauthUser.setUsername(phone);
+            oauthUser.setPhone(phone);
+            oauthUser.setPassword(password);
+            oauthUser.setEnable(true);
+            oauthUser = oauthUserRepository.save(oauthUser);
 
-            UserInfo appUser = new UserInfo();
-            String name = "phone_"+phone;
-            appUser.setUsername(name);
-            appUser.setPhone(phone);
+            Authority authority = new Authority();
+            authority.setUsnername(phone);
+            authority.setAuthority("ROLE_USER");
+            authority = authorityRepository.save(authority);
 
-            appUser = userInfoRepository.save(appUser);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(oauthUser.getId());
 
-            logger.warn(appUser.toString());
-
-            if (result1 > 0 && result2 > 0) {
-                return new ResultMsg(201, "注册成功", userInfoRepository.findByUsername(name));
-            }else{
-                return new ResultMsg(500, "sql执行失败");
-            }
+            return new ResultMsg(201, "注册成功", userInfoRepository.save(userInfo));
         } catch (DataIntegrityViolationException e) {
             return new ResultMsg(409, "用户名已存在", e.getMessage());
         }
@@ -160,16 +132,15 @@ public class OauthUserController {
     @ApiOperation(value = "更新密码（使用旧密码）", notes = "目前密码是明文存储，正式发布前需要做加密")
     @RequestMapping(value = "/updatePassword/{oldPassword}/{newPassword}", method = RequestMethod.PATCH)
     private ResultMsg updatePassword(@RequestParam String access_token, @PathVariable String oldPassword, @PathVariable String newPassword){
-        Map<String, Object> responseMap = new LinkedHashMap<>();
-        String phone = getPhoneByAccessToken(access_token);
-        OauthUser oauthUser = findOauthUserByUsername(phone);
+        String username = getUsernameByAccessToken(access_token);
+        OauthUser oauthUser = findOauthUserByUsername(username);
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
 
         if (null!=oauthUser){
             if(encoder.matches(oldPassword, oauthUser.getPassword())){
                 try{
-                    this.jdbcTemplate.update("UPDATE users SET password = ? WHERE username = ?", encoder.encode(newPassword), phone);
+                    this.jdbcTemplate.update("UPDATE users SET password = ? WHERE username = ?", encoder.encode(newPassword), username);
                     return new ResultMsg(200, "更新密码成功");
                 }catch (Exception e){
                     return new ResultMsg(404, "更新密码失败", e.getMessage());
@@ -215,7 +186,7 @@ public class OauthUserController {
                     return oauthUser;
                 });
     }
-    private String getPhoneByAccessToken(String access_token){
+    private String getUsernameByAccessToken(String access_token){
         return jdbcTemplate.queryForObject("SELECT user_name FROM oauth_access_token" +
                 " WHERE encode(token, 'escape') LIKE CONCAT('%', ?)", new Object[]{access_token}, String.class);
         /*return jdbcTemplate.queryForObject("SELECT user_name FROM oauth_access_token" +

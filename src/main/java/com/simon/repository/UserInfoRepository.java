@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Created by simon on 2016/8/13.
  */
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
-    UserInfo findByUsername(String username);
+    UserInfo findById(Long id);
+    UserInfo findByUserId(Long userId);
     UserInfo findByPhone(String phone);
-    UserInfo findById(String id);
+    UserInfo findByUsername(String username);
+    UserInfo findByEmail(String email);
 }
