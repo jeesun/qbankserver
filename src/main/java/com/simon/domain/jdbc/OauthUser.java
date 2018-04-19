@@ -1,13 +1,19 @@
 package com.simon.domain.jdbc;
 
+import javax.persistence.*;
+
 /**
  * Created by simon on 2017/2/26.
  */
+@Table(name = "users")
+@Entity
 public class OauthUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
     private String password;
-    private boolean enable;
+    private Boolean enable;
     private String email;
     private String phone;
 
@@ -27,11 +33,11 @@ public class OauthUser {
         this.password = password;
     }
 
-    public boolean isEnable() {
+    public Boolean getEnable() {
         return enable;
     }
 
-    public void setEnable(boolean enable) {
+    public void setEnable(Boolean enable) {
         this.enable = enable;
     }
 
