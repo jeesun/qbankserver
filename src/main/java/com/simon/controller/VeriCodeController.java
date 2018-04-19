@@ -1,5 +1,6 @@
 package com.simon.controller;
 
+import com.simon.domain.ResultMsg;
 import com.simon.domain.VeriCode;
 import com.simon.repository.VeriCodeRepository;
 import com.simon.utils.ServerContext;
@@ -15,9 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Created by simon on 2016/9/19.
  */
@@ -31,9 +29,7 @@ public class VeriCodeController {
     @ApiOperation(value = "获取验证码", notes = "验证码有效时间是30分钟，验证码在失效前5分钟就会重新生成一个返回，给用户通过验证码修改密码足够的时间")
     /*@ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "string")*/
     @RequestMapping(value = "/getRegisterCode", method = RequestMethod.GET)
-    private Map<String, Object> getVeriCode(@RequestParam String phone){
-        Map<String, Object> responseMap = new LinkedHashMap<>();
-
+    private ResultMsg getVeriCode(@RequestParam String phone){
         try{
             VeriCode veriCode = veriCodeRepository.findByPhone(phone);
             if (null==veriCode){
@@ -63,41 +59,28 @@ public class VeriCodeController {
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             System.out.println(rsp.getBody());
             if (rsp.getResult().getSuccess()){
-                responseMap.put(ServerContext.STATUS_CODE, 200);
-                responseMap.put(ServerContext.MSG, "验证码已发送");
+                return new ResultMsg(200, "验证码已发送");
             }else{
-                responseMap.put(ServerContext.STATUS_CODE, 200);
-                responseMap.put(ServerContext.MSG, "验证码发送失败，请稍后重试");
+                return new ResultMsg(200, "验证码发送失败，请稍后重试");
             }
 
         }catch (Exception e){
-            responseMap.put(ServerContext.STATUS_CODE, 500);
-            responseMap.put(ServerContext.MSG, e.getMessage());
-            responseMap.put(ServerContext.DEV_MSG, e.getMessage());
+            return new ResultMsg(500, e.getMessage());
         }
-
-        return responseMap;
     }
 
     @ApiOperation(value = "校验验证码")
     @RequestMapping(value = "/checkVeriCode", method = RequestMethod.GET)
-    private Map<String, Object> checkVeriCode(@RequestParam String phone, @RequestParam Integer code){
-        Map<String, Object> responseMap = new LinkedHashMap<>();
+    private ResultMsg checkVeriCode(@RequestParam String phone, @RequestParam Integer code){
         try{
             VeriCode veriCode = veriCodeRepository.findByPhoneAndCode(phone, code);
             if (null!=veriCode){
-                responseMap.put(ServerContext.STATUS_CODE, 200);
-                responseMap.put(ServerContext.MSG, "验证码正确");
+                return new ResultMsg(200, "验证码正确");
             }else{
-                responseMap.put(ServerContext.STATUS_CODE, 404);
-                responseMap.put(ServerContext.MSG, "验证码错误");
+                return new ResultMsg(404, "验证码错误");
             }
         }catch (Exception e){
-            responseMap.put(ServerContext.STATUS_CODE, 404);
-            responseMap.put(ServerContext.MSG, "验证码错误");
-            responseMap.put(ServerContext.DEV_MSG, e.getMessage());
+            return new ResultMsg(404, "验证码错误", e.getMessage());
         }
-        return responseMap;
     }
-
 }
