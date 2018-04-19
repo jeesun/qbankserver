@@ -4,12 +4,15 @@ import com.simon.domain.ResultMsg;
 import com.simon.domain.VeriCode;
 import com.simon.repository.VeriCodeRepository;
 import com.simon.utils.ServerContext;
+import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
+import com.taobao.api.domain.BizResult;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/veriCodes")
 public class VeriCodeController {
+    private static Logger logger = Logger.getLogger(VeriCodeController.class);
+
     @Autowired
     private VeriCodeRepository veriCodeRepository;
 
@@ -30,42 +35,45 @@ public class VeriCodeController {
     /*@ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "string")*/
     @RequestMapping(value = "/getRegisterCode", method = RequestMethod.GET)
     private ResultMsg getVeriCode(@RequestParam String phone){
-        try{
-            VeriCode veriCode = veriCodeRepository.findByPhone(phone);
-            if (null==veriCode){
-                veriCode = new VeriCode();
-                veriCode.setPhone(phone);
-                veriCode.setCode((int)Math.random()*899999+100000);
+
+        VeriCode veriCode = veriCodeRepository.findByPhone(phone);
+        if (null==veriCode){
+            veriCode = new VeriCode();
+            veriCode.setPhone(phone);
+            veriCode.setCode((int)Math.random()*899999+100000);
+            veriCode.setCreateTime(System.currentTimeMillis());
+            veriCode.setExpires(30*60);
+            veriCodeRepository.save(veriCode);
+        }else{
+            if (System.currentTimeMillis()>(veriCode.getCreateTime()+veriCode.getExpires()-60*5)){
+                veriCode.setCode((int)(Math.random()*899999)+100000);
                 veriCode.setCreateTime(System.currentTimeMillis());
                 veriCode.setExpires(30*60);
                 veriCodeRepository.save(veriCode);
-            }else{
-                if (System.currentTimeMillis()>(veriCode.getCreateTime()+veriCode.getExpires()-60*5)){
-                    veriCode.setCode((int)(Math.random()*899999)+100000);
-                    veriCode.setCreateTime(System.currentTimeMillis());
-                    veriCode.setExpires(30*60);
-                    veriCodeRepository.save(veriCode);
-                }
             }
-            TaobaoClient client = new DefaultTaobaoClient(
-                    ServerContext.DAYU_URL_REAL, ServerContext.DAYU_APP_KEY, ServerContext.DAYU_APP_SECRET);
-            AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
-            req.setExtend("");
-            req.setSmsType("normal");
-            req.setSmsFreeSignName(ServerContext.DAYU_SMS_FREE_SIGN_NAME);
-            req.setSmsParamString("{veriCode:'"+veriCode.getCode()+"'}");
-            req.setRecNum(phone);
-            req.setSmsTemplateCode(ServerContext.DAYU_SMS_TEMPLATE_CODE);
-            AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
-            System.out.println(rsp.getBody());
-            if (rsp.getResult().getSuccess()){
+        }
+        TaobaoClient client = new DefaultTaobaoClient(
+                ServerContext.DAYU_URL_REAL, ServerContext.DAYU_APP_KEY, ServerContext.DAYU_APP_SECRET);
+        AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
+        req.setExtend("");
+        req.setSmsType("normal");
+        req.setSmsFreeSignName(ServerContext.DAYU_SMS_FREE_SIGN_NAME);
+        req.setSmsParamString("{veriCode:'"+veriCode.getCode()+"'}");
+        req.setRecNum(phone);
+        req.setSmsTemplateCode(ServerContext.DAYU_SMS_TEMPLATE_CODE);
+        AlibabaAliqinFcSmsNumSendResponse rsp = null;
+        try {
+            rsp = client.execute(req);
+            BizResult bizResult = rsp.getResult();
+            if (null != bizResult && bizResult.getSuccess()){
                 return new ResultMsg(200, "验证码已发送");
             }else{
+                logger.error("请确认阿里大于账号还有余额");
                 return new ResultMsg(200, "验证码发送失败，请稍后重试");
             }
-
-        }catch (Exception e){
-            return new ResultMsg(500, e.getMessage());
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return new ResultMsg(500, e.getErrMsg());
         }
     }
 

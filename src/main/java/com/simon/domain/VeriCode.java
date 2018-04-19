@@ -6,10 +6,11 @@ import javax.persistence.*;
  * Created by simon on 2017/2/28.
  */
 
-@Table
+@Table(name = "veri_code")
 @Entity
 public class VeriCode {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String phone;

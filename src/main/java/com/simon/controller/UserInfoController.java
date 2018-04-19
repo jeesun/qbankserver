@@ -14,6 +14,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -120,8 +121,36 @@ public class UserInfoController {
             userInfo.setAddress(address);
         }
 
-        return new ResultMsg(200, "", userInfoRepository.save(userInfo));
+        return new ResultMsg(200, "更新用户信息成功", userInfoRepository.save(userInfo));
     }
+
+    @ApiOperation(value = "更新用户信息2")
+    @RequestMapping(value = "/update2", method = RequestMethod.PATCH)
+    @Transactional
+    public ResultMsg update(@RequestParam String access_token,
+            @RequestParam(required = false) String newUsername,
+            @RequestParam(required = false) String newPhone,
+            @RequestParam(required = false) String newEmail){
+        String username = getUsernameByAccessToken(access_token);
+        UserInfo userInfo = userInfoRepository.findByUsername(username);
+        OauthUser oauthUser = oauthUserRepository.findByUsername(username);
+        if(null != newUsername){
+            userInfo.setUsername(newUsername);
+            oauthUser.setUsername(newUsername);
+        }
+        if(null != newPhone){
+            userInfo.setPhone(newPhone);
+            oauthUser.setPhone(newPhone);
+        }
+        if(null != newEmail){
+            userInfo.setEmail(newEmail);
+            oauthUser.setEmail(newEmail);
+        }
+        userInfoRepository.save(userInfo);
+        oauthUserRepository.save(oauthUser);
+        return new ResultMsg(200, "更新成功");
+    }
+
 
     private String getUsernameByAccessToken(String access_token){
         return jdbcTemplate.queryForObject("SELECT user_name FROM oauth_access_token" +

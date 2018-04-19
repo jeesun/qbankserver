@@ -1,20 +1,22 @@
 package com.simon.domain.jdbc;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Table(name = "authorities")
 @Entity
 public class Authority {
-    private String usnername;
+    @Id
+    private String username;
     private String authority;
 
-    public String getUsnername() {
-        return usnername;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUsnername(String usnername) {
-        this.usnername = usnername;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getAuthority() {
