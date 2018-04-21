@@ -127,7 +127,10 @@ public class UserInfo {
     public String toString() {
         return "UserInfo{" +
                 "id=" + id +
-                ", userId='" + userId + '\'' +
+                ", userId=" + userId +
+                ", username='" + username + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
                 ", sex=" + sex +
                 ", age=" + age +
                 ", birth='" + birth + '\'' +
