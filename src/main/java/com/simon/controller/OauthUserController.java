@@ -50,7 +50,7 @@ public class OauthUserController {
     private static Logger logger = Logger.getLogger(OauthUserController.class);
 
 
-    @ApiOperation(value = "登录", notes = "this is notes", httpMethod = "GET")
+    @ApiOperation(value = "登录", notes = "返回UserIfo和access_token", httpMethod = "GET")
     @RequestMapping(value = "/{phone}/{password}", method = RequestMethod.GET)
     private ResultMsg get(@PathVariable(value = "phone") String phone,
                           @PathVariable(value = "password") String password) {
@@ -87,7 +87,32 @@ public class OauthUserController {
         }
     }
 
-    @Deprecated
+    @ApiOperation(value = "刷新access_token", notes = "使用refresh_token刷新access_token", httpMethod = "POST")
+    @RequestMapping(method = RequestMethod.POST, value = "/refreshToken")
+    public ResultMsg post(@RequestParam String refresh_token){
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("client_id", "clientIdPassword");
+        map.put("client_secret", "secret");
+        map.put("grant_type", "refresh_token");
+        map.put("refresh_token", refresh_token);
+        //access_token
+        AccessToken accessToken;
+        try {
+            accessToken = HttpClientUtil.postAndGetToken("clientIdPassword",
+                    "secret", ServerContext.OAUTH_URI, map, "UTF-8");
+            return new ResultMsg(200, "登录成功", accessToken);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResultMsg(404, "用户名或者密码错误", e.getMessage());
+        }
+    }
+
+    /*@ApiOperation(value = "检查access_token", notes = "检查access_token是否过期", httpMethod = "GET")
+    @RequestMapping(method = RequestMethod.GET, value = "/checkToken")
+    public ResultMsg checkToken(@RequestParam String token){
+
+    }*/
+
     @ApiOperation(value = "注册", notes = "注册成功返回appUser对象，包含自动生成的username", httpMethod = "POST")
     @RequestMapping(value = "/registerWithVeriCode",method = RequestMethod.POST)
     public ResultMsg post(@RequestParam(required = false) Integer code, @RequestParam String phone, @RequestParam String password) {
@@ -108,7 +133,7 @@ public class OauthUserController {
     }
 
     @Transactional//事务加在接口方法上，会造成JpaRepository未注入。加在普通方法上没有问题。
-    public ResultMsg register(String phone, String password){
+    protected ResultMsg register(String phone, String password){
         //判断username是否存在
         try {
             OauthUser oauthUser = new OauthUser();

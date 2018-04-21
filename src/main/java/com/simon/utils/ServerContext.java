@@ -31,5 +31,5 @@ public class ServerContext {
     public static final Integer AUDIT_RESULT_REFUSED = 2;
     public static final Integer AUDIT_RESULT_RESUBMIT = 3;
 
-    public static final String OAUTH_URI = "http://118.178.141.72:8761/oauth/oauth/token";
+    public static final String OAUTH_URI = "http://localhost:8182/oauth/token";
 }
