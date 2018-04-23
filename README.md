@@ -3,7 +3,8 @@
 ## 功能列表
 - 集成阿里大于发送手机验证码功能；
 - 集成swagger2，访问[http://localhost:8184/swagger-ui.html](http://localhost:8184/swagger-ui.html)；
-- 封装了`oauthserver`模块提供的access_token相关的接口。
+- 封装了`oauthserver`模块提供的access_token相关的接口；
+- 日志保存到文件并按日归档。
 
 ## 截图
 ![swagger-ui](screenshots/2018-04-22_025343.png)
