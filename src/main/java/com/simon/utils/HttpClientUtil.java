@@ -31,7 +31,7 @@ public class HttpClientUtil {
 
         String credentials = clientId + ":" + clientSecret;
         final String basic = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes("UTF-8"));
-        log.error(basic);
+        log.info(basic);
         String body="";
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(uri);
@@ -54,7 +54,7 @@ public class HttpClientUtil {
         }
         EntityUtils.consume(entity);
         response.close();
-        log.error(body);
+        log.info("body=" + body);
         return body;
 
     }
