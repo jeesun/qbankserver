@@ -3,9 +3,12 @@ package com.simon.controller;
 import com.simon.domain.QrCode;
 import com.simon.domain.ResultMsg;
 import com.simon.repository.QrCodeRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@Api(value = "二维码", description = "网页端扫码登录")
 @RestController
 @RequestMapping("/api/qrCodes")
 public class QrCodeController {
@@ -18,6 +21,7 @@ public class QrCodeController {
      * @param sid
      * @return
      */
+    @ApiOperation(value = "app扫描网页端二维码登录", notes = "app扫描网页端二维码登录")
     @RequestMapping(method = RequestMethod.POST, value = "/loginByQrCode")
     public ResultMsg postLoginByQrCode(
             @RequestParam String username,
