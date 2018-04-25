@@ -7,6 +7,7 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -29,6 +30,21 @@ public class Swagger2 {
     @Value("${swagger2.version}")
     private String version;
 
+    @Value("${swagger2.contact.name}")
+    private String contactName;
+
+    @Value("${swagger2.contact.url}")
+    private String contactUrl;
+
+    @Value("${swagger2.contact.email}")
+    private String contactEmail;
+
+    @Value("${swagger2.license}")
+    private String license;
+
+    @Value("${swagger2.license-url}")
+    private String licenseUrl;
+
     @Bean
     public Docket createRestApi(){
         return new Docket(DocumentationType.SWAGGER_2)
@@ -44,6 +60,10 @@ public class Swagger2 {
                 .title(title)
                 .description(description)
                 .termsOfServiceUrl(termsOfServiceUrl)
-                .version(version).build();
+                .version(version)
+                .contact(new Contact(contactName, contactUrl, contactEmail))
+                .license(license)
+                .licenseUrl(licenseUrl)
+                .build();
     }
 }
