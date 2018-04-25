@@ -5,6 +5,9 @@ public class ResultMsg {
     private String msg;
     private Object data;
 
+    public ResultMsg() {
+    }
+
     public ResultMsg(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
