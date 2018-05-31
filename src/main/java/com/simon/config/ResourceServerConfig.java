@@ -20,10 +20,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/swagger-ui.html","/v2/api-docs").permitAll()
-                .antMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers(new AntPathRequestMatcher("/api/events", "POST")).hasRole("ADMIN")
-                .requestMatchers(new AntPathRequestMatcher("/api/events/{id}", "PATCH")).hasRole("ADMIN")
-                .requestMatchers(new AntPathRequestMatcher("/api/events/getByPublisher", "GET")).hasRole("ADMIN")
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/**").permitAll()
                 //.antMatchers("/**").authenticated() will
